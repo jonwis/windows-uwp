@@ -162,30 +162,18 @@ To grant package identity to your desktop app, your app must register the sparse
 The following example demonstrates how to register a sparse package. This code creates an **AddPackageOptions** object that contains the path to the external location where your package manifest can reference content outside the package. Then, the code passes this object to the **PackageManager.AddPackageByUriAsync**  method to register the sparse package. This method also receives the location of your signed sparse package as a URI. For a more complete example, see the `StartUp.cs` code file in the related [sample](#sample).
 
 ```csharp
-private static bool registerSparsePackage(string externalLocation, string sparsePkgPath)
+private static Task<void> RegisterSparsePackageAsync(string externalLocation, string sparsePkgPath)
 {
-    bool registration = false;
-    try
-    {
-        Uri externalUri = new Uri(externalLocation);
-        Uri packageUri = new Uri(sparsePkgPath);
+    Console.WriteLine("Registering {0} to cover {1}", sparsePkgPath, externalLocation);
 
-        Console.WriteLine("exe Location {0}", externalLocation);
-        Console.WriteLine("msix Address {0}", sparsePkgPath);
+    var packageManager = new PackageManager();
+    var packageUri = new Uri(sparsePkgPath);
 
-        Console.WriteLine("  exe Uri {0}", externalUri);
-        Console.WriteLine("  msix Uri {0}", packageUri);
-
-        PackageManager packageManager = new PackageManager();
-
-        // Declare use of an external location
-        var options = new AddPackageOptions();
-        options.ExternalLocationUri = externalUri;
-
-        Windows.Foundation.IAsyncOperationWithProgress<DeploymentResult, DeploymentProgress> deploymentOperation = packageManager.AddPackageByUriAsync(packageUri, options);
-
-        // Other progress and error-handling code omitted for brevity...
-    }
+    // Declare use of an external location
+    var options = new AddPackageOptions();
+    options.ExternalLocationUri = new Uri(externalLocation);
+     
+    await packageManager.AddPackageByUriAsync(packageUri, options);
 }
 ```
 
